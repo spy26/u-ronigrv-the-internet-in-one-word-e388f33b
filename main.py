@@ -13,6 +13,7 @@ The word is a constant in this file, so every run produces the same
 bytes.
 """
 
+import hashlib
 import os
 import sys
 
@@ -63,7 +64,11 @@ def main():
         written = handle.read()
     if written != data:
         fail("read-back mismatch: wrote %r, read %r" % (data, written))
-    print("wrote %s (%d bytes, %d characters)" % (path, len(data), len(WORD)))
+    if written.decode("utf-8") != WORD:
+        fail("read-back text %r is not the entry word" % written.decode("utf-8"))
+    digest = hashlib.sha256(written).hexdigest()
+    print("wrote %s (%d bytes, %d characters, sha256 %s)"
+          % (path, len(data), len(WORD), digest))
 
 
 if __name__ == "__main__":
